@@ -21,21 +21,21 @@ class EncoderBlock(nn.Module):
         layer-norm_feed_forward (nn.LayerNorm): Layer normalization after the feed-forward network.
     """
 
-    def __init__(self, input_size, head_sizes, output_size_attention, output_size_feed_forward):
+    def __init__(self, input_size, head_sizes, attention_output_size, feed_forward_output_sizes):
         """
         Initializes the EncoderBlock module.
 
         Args:
             input_size (int): The size of the input tensor.
             head_sizes (List[int]): The number of attention heads.
-            output_size_attention (int): The size of the output tensor from the attention mechanism.
-            output_size_feed_forward (int): The size of the output tensor from the feed-forward network.
+            attention_output_size (int): The size of the output tensor from the attention mechanism.
+            feed_forward_output_sizes (int): The size of the output tensor from the feed-forward network.
         """
         super().__init__()
         self.input_size = input_size
-        self.output_size_attention = output_size_attention
+        self.output_size_attention = attention_output_size
         self.head_sizes = head_sizes
-        self.output_size_feed_forward = output_size_feed_forward
+        self.output_size_feed_forward = feed_forward_output_sizes
 
         # TODO
         """
@@ -46,7 +46,7 @@ class EncoderBlock(nn.Module):
             self.output_size_ffn = output_size_ffn
         """
 
-        self.multihead_attention = MultiHeadAttention(input_size, output_size_attention, head_sizes)
+        self.multihead_attention = MultiHeadAttention(input_size, attention_output_size, head_sizes)
         self.feed_forward = nn.Sequential(nn.Linear
                                           (self.output_size_attention, self.output_size_feed_forward), nn.ReLU())
         self.layernorm_attention = nn.LayerNorm(normalized_shape=self.output_size_attention)
