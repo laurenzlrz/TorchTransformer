@@ -42,7 +42,7 @@ class EncoderStack(nn.Module):
                                                          feed_forward_output_size))
             block_input_size = feed_forward_output_size
 
-        self.encoder_stack = nn.ModuleList(self.encoder_blocks_list)
+        self.encoder_stack = nn.Sequential(*self.encoder_blocks_list)
 
     def forward(self, x):
         """
@@ -55,7 +55,4 @@ class EncoderStack(nn.Module):
         Returns:
             Tensor: The output tensor after applying the encoder blocks.
         """
-        for encoder_block in self.encoder_blocks:
-            x = encoder_block(x)
-
-        return x
+        return self.encoder_stack(x)
