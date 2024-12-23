@@ -8,12 +8,12 @@ from src.encoder.PositionalEncoding import PositionalEncoding
 class TimeSeriesTransformer(nn.Module):
     """
     TimeSeriesTransformer is a neural network model for time series prediction.
-    It consists of an encoder stack and a linear layer for regression.
+    It consists of an encoder2 stack and a linear layer for regression.
 
     Attributes:
         input_size (int): The size of the input tensor.
         positional_encoding (PositionalEncoding): The positional encoding module.
-        encoder_stack (EncoderStack): The stack of encoder blocks.
+        encoder_stack (EncoderStack): The stack of encoder2 blocks.
         regressor (nn.Linear): The linear layer for regression.
     """
 
@@ -23,7 +23,7 @@ class TimeSeriesTransformer(nn.Module):
 
         Args:
             input_size (int): The size of the input tensor.
-            head_sizes (List[List[int]]): The number of attention heads for each block in the encoder stack.
+            head_sizes (List[List[int]]): The number of attention heads for each block in the encoder2 stack.
         """
         super(TimeSeriesTransformer, self).__init__()
         self.input_size = input_size
@@ -34,7 +34,7 @@ class TimeSeriesTransformer(nn.Module):
     def forward(self, x):
         """
         Forward pass for the TimeSeriesTransformer model.
-        Positional encoding is applied to the input tensor, then passed through the encoder stack.
+        Positional encoding is applied to the input tensor, then passed through the encoder2 stack.
         The output is pooled and passed through the regressor.
 
         Args:

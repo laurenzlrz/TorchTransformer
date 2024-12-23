@@ -14,7 +14,7 @@ class EncoderStack(nn.Module):
         encoder_blocks_list (List[EncoderBlock]): List of EncoderBlock instances.
         encoder_stack (nn.ModuleList): ModuleList containing the EncoderBlock instances.
         input_size (int): The size of the input tensor.
-        output_size (int): The size of the output tensor after applying the encoder blocks.
+        output_size (int): The size of the output tensor after applying the encoder2 blocks.
     """
 
     def __init__(self, input_size, head_sizes):
@@ -34,12 +34,12 @@ class EncoderStack(nn.Module):
     def forward(self, x):
         """
         Forward pass for the MultiEncoder module.
-        Applies the encoder blocks sequentially.
+        Applies the encoder2 blocks sequentially.
 
         Args:
             x (Tensor): The input tensor.
 
         Returns:
-            Tensor: The output tensor after applying the encoder blocks.
+            Tensor: The output tensor after applying the encoder2 blocks.
         """
         return self.encoder_stack(x)
