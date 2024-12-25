@@ -3,7 +3,11 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import StandardScaler
 
+from src.encoder.Masking import BertMasking
+
 CSV_PATH = "ETTh1.csv"
+
+BertMasking = BertMasking(replace_token=-1, probability=0.3)
 
 class ETTh1Dataset(Dataset):
     def __init__(self, csv_path, seq_length=96, pred_length=24):

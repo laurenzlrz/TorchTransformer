@@ -6,10 +6,16 @@ class Masking(ABC):
 
     def __init__(self, replace_token):
         self.replace_token = replace_token
+        self.training = False
         pass
 
-    @abstractmethod
     def mask(self, x: torch.Tensor) -> torch.Tensor:
+        if self.training:
+            return self.applyMask(x)
+        return x
+
+    @abstractmethod
+    def applyMask(self, x: torch.Tensor) -> torch.Tensor:
         pass
 
 
@@ -20,7 +26,7 @@ class BertMasking(Masking):
         self.probability = probability
 
 
-    def mask(self, x: torch.Tensor) -> torch.Tensor:
+    def applyMask(self, x: torch.Tensor) -> torch.Tensor:
         mask = torch.rand(x.size()) < self.probability
         x[mask] = self.replace_token
         return x

@@ -1,9 +1,10 @@
 from torch import nn
 import torch
+from torch.nn.modules.module import T
 
 from src.encoder.EncoderStack import EncoderStack
 from src.encoder.PositionalEncoding import PositionalEncoding
-
+from src.encoder.Masking import Masking
 
 class TimeSeriesTransformer(nn.Module):
     """
@@ -17,7 +18,7 @@ class TimeSeriesTransformer(nn.Module):
         regressor (nn.Linear): The linear layer for regression.
     """
 
-    def __init__(self, input_size, head_sizes):
+    def __init__(self, input_size, head_sizes, mask):
         """
         Initializes the TimeSeriesTransformer model.
 
@@ -27,6 +28,8 @@ class TimeSeriesTransformer(nn.Module):
         """
         super(TimeSeriesTransformer, self).__init__()
         self.input_size = input_size
+        self.head_sizes = head_sizes
+        self.mask = mask
         self.positional_encoding = PositionalEncoding(self.input_size)
         self.encoder_stack = EncoderStack(input_size, head_sizes)
         self.regressor = nn.Linear(self.input_size, 1)
@@ -43,12 +46,21 @@ class TimeSeriesTransformer(nn.Module):
         Returns:
             Tensor: The predicted output tensor.
         """
-        positional_encoded = self.positional_encoding(x)
+        masked = self.mask.mask(x)
+        positional_encoded = self.positional_encoding(masked)
         encoded = self.encoder_stack(positional_encoded)
         pooled = encoded.mean(dim=-2)
         pred = self.regressor(pooled)
 
         return pred
+
+    def train(self: T, mode: bool = True) -> T:
+        self.mask.training = True
+        return super().train(mode)
+
+    def eval(self: T) -> T:
+        self.mask.training = False
+        return super().eval()
 
 
 # Example usage
