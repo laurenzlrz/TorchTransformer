@@ -25,7 +25,6 @@ class BertMasking(Masking):
         super().__init__(replace_token)
         self.probability = probability
 
-
     def applyMask(self, x: torch.Tensor) -> torch.Tensor:
         mask = torch.rand(x.size()) < self.probability
         x[mask] = self.replace_token
