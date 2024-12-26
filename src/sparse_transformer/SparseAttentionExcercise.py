@@ -25,24 +25,52 @@ print(torch.matmul(c, filtered).squeeze(1))
 
 # End of practice
 
-# measure time taken for matrix multiplication with or without unsqueeze and transpose
-start_time = time.time()
+# '# measure time taken for matrix multiplication with or without unsqueeze and transpose
+# start_time = time.time()
+#
+# '# Create a tensor with shape (10000, 10000)
+# a = torch.rand(1000, 1000)
+# b = torch.rand(1000, 1000)
+# c = torch.matmul(a, b)
+#
+# end_time = time.time()
+# print(f"Time taken: {end_time - start_time}")
+#
+# start_time = time.time()
+#
+# a = torch.rand(1000, 1, 1000)
+# b = torch.rand(1000, 1000)
+# c = torch.matmul(a, b).transpose(0,1).unsqueeze(0)
+#
+# end_time = time.time()
+# print(f"Time taken: {end_time - start_time}")
 
-# Create a tensor with shape (10000, 10000)
-a = torch.rand(1000, 1000)
-b = torch.rand(1000, 1000)
+# Test filtering instead of masking
+k = 3000
+a = torch.rand(k, k)
+b = torch.rand(k, k)
+
+start_time = time.time()
 c = torch.matmul(a, b)
-
 end_time = time.time()
 print(f"Time taken: {end_time - start_time}")
+print(c.shape)
+
+a = torch.rand(k, k)
+b = torch.rand(k, k)
+filter = [[i] for i in range(0,k)]
 
 start_time = time.time()
 
-a = torch.rand(1000, 1, 1000)
-b = torch.rand(1000, 1000)
-c = torch.matmul(a, b).transpose(0,1).unsqueeze(0)
+filtered = a[filter, :].transpose(1,2)
+b = b.unsqueeze(1)
+d = torch.matmul(b, filtered).squeeze(2)
 
 end_time = time.time()
+
 print(f"Time taken: {end_time - start_time}")
+print(d.shape)
+
+# Test sucessful, filtered matrix multiplication is faster than masking
 
 
