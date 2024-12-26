@@ -23,7 +23,6 @@ class AttentionHead(nn.Module):
         Args:
             input_size (int): Dimension of the input tensor.
             hidden_size (int): Dimension of the hidden layer.
-            initialization (TensorCreationMode): Mode for tensor initialization.
             dropout_prob (float): Dropout probability (currently unused).
         """
         super().__init__()
