@@ -13,6 +13,9 @@ class AbstractTrainer(ABC):
         self.val_loader = val_loader
         self.device = device
         self.model.to(self.device)
+        self.logging = False
+        self.logging_metrics = [loss_fn]
+        self.log = {loss_fn.__class__.__name__: []}
 
     @abstractmethod
     def train_one_epoch(self):
@@ -21,6 +24,31 @@ class AbstractTrainer(ABC):
         """
         pass
 
+    def train(self, epochs):
+
+        for epoch in range(epochs):
+            training_loss = self.train_one_epoch()
+
+            if self.val_loader is not None:
+                val_loss = self.validate()
+                print(f'Epoch: {epoch} || Training Loss: {training_loss:.4f} || Validation Loss: {val_loss:.4f}')
+            else:
+                print(f'Epoch: {epoch} || Training Loss: {training_loss:.4f}')
+
+        return self.model
+
+    def toggle_logging(self):
+        """
+        Toggles the logging. If Ture additional metrics are calculated and saved during training
+        """
+        self.logging = not self.logging
+
+    def add_logging_metric(self, metric):
+        """
+        Adds additional logging metrics to the logging.
+        """
+        self.logging_metrics.append(metric)
+        self.log[metric.__class__.__name__] = []
     @abstractmethod
     def validate(self):
         """
