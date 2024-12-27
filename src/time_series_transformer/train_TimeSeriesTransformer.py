@@ -25,7 +25,10 @@ train_dataloader = get_etth1_dataloader(ETTh1_csv,
 print(f'Number of batches: {len(train_dataloader)}')
 
 bertMasking = BertMasking(replace_token=-1, probability=0.0)
-model = TimeSeriesTransformer(input_size=num_variables, head_sizes=input_head_sizes, mask=bertMasking)
+model = TimeSeriesTransformer(input_size=num_variables,
+                              head_sizes=input_head_sizes,
+                              output_size=num_variables,
+                              mask=bertMasking)
 
 print(f'Number of trainable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}')
 
@@ -33,7 +36,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 timeSeriesTrainer = TimeSeriesTrainer(model, optimizer, train_dataloader, device=device)
 
-timeSeriesTrainer.toggle_logging()
+#timeSeriesTrainer.train_one_epoch()
 
 timeSeriesTrainer.train(10)
 

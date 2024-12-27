@@ -37,16 +37,18 @@ class AbstractTrainer(ABC):
 
         self.model.train()
 
+        print('Training Started!')
+
         for epoch in range(epochs):
             training_loss = self.train_one_epoch()
 
             if self.val_loader is not None:
                 self.model.eval()
                 val_loss = self.validate()
-                print(f'Epoch: {epoch} || Training Loss: {training_loss:.4f} || Validation Loss: {val_loss:.4f}')
+                print(f'Epoch: {epoch} | Training Loss: {training_loss:.4f} | Validation Loss: {val_loss:.4f}')
                 self.model.train()
             else:
-                print(f'Epoch: {epoch} || Training Loss: {training_loss:.4f}')
+                print(f'Epoch: {epoch} | Training Loss: {training_loss:.4f}')
 
         return self.model
 

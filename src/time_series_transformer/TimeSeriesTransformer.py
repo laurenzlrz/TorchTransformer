@@ -18,7 +18,7 @@ class TimeSeriesTransformer(nn.Module):
         regressor (nn.Linear): The linear layer for regression.
     """
 
-    def __init__(self, input_size, head_sizes, mask):
+    def __init__(self, input_size, head_sizes, output_size, mask):
         """
         Initializes the TimeSeriesTransformer model.
 
@@ -32,7 +32,7 @@ class TimeSeriesTransformer(nn.Module):
         self.mask = mask
         self.positional_encoding = PositionalEncoding(self.input_size)
         self.encoder_stack = EncoderStack(input_size, head_sizes)
-        self.regressor = nn.Linear(self.input_size, 1)
+        self.regressor = nn.Linear(self.input_size, output_size)
 
     def forward(self, x):
         """

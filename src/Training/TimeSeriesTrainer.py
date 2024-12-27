@@ -16,7 +16,7 @@ class TimeSeriesTrainer(AbstractTrainer):
         # Iterate through the dataset
         for X, Y in self.train_loader:
             X, Y = X.to(self.device), Y.to(self.device)
-            Y = Y[:, :, 0] #for testin purposes
+            Y = Y.squeeze()
             predictions = self.model(X)
             loss = self.loss_fn(predictions, Y)
 
