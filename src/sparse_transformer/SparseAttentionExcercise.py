@@ -2,10 +2,10 @@
 # Goal is to implement the forward pass of the SparseAttention module
 # Challenge is the mask of the keys and values, because they are different for each query
 
-from torch import masked
 import torch
 import time
 
+# Test filtering and transposing
 tensor = torch.linspace(1, 6, steps=6).view(2, 3)
 
 a = torch.ones(2)
@@ -17,33 +17,9 @@ row_filter = torch.tensor([[1,2], [0,2]])
 filtered = tensor[:, row_filter].permute(1,0,2)
 print(tensor)
 print(filtered)
-
-
 print(c)
-
 print(torch.matmul(c, filtered).squeeze(1))
 
-# End of practice
-
-# '# measure time taken for matrix multiplication with or without unsqueeze and transpose
-# start_time = time.time()
-#
-# '# Create a tensor with shape (10000, 10000)
-# a = torch.rand(1000, 1000)
-# b = torch.rand(1000, 1000)
-# c = torch.matmul(a, b)
-#
-# end_time = time.time()
-# print(f"Time taken: {end_time - start_time}")
-#
-# start_time = time.time()
-#
-# a = torch.rand(1000, 1, 1000)
-# b = torch.rand(1000, 1000)
-# c = torch.matmul(a, b).transpose(0,1).unsqueeze(0)
-#
-# end_time = time.time()
-# print(f"Time taken: {end_time - start_time}")
 
 # Test filtering instead of masking
 k = 3000
@@ -72,5 +48,53 @@ print(f"Time taken: {end_time - start_time}")
 print(d.shape)
 
 # Test sucessful, filtered matrix multiplication is faster than masking
+
+# Test create filter for each query
+
+def select_nodes(i, k, num_elements):
+    """
+    Selects a subset of nodes according to the specified rules.
+
+    Args:
+        i (int): The index of the current node.
+        k (int): The number of neighboring elements.
+        num_elements (int): The total number of elements in the tree.
+
+    Returns:
+        List[int]: A list of indices of the selected nodes.
+    """
+    selected_indices = []
+    current_layer = 1
+    current_index = i
+
+    while current_index < num_elements:
+        # Calculate the range of neighboring nodes to be selected
+        start_index = max(0, current_index - k)
+        end_index = min(current_index + k + 1, num_elements)
+
+        # Select the neighboring nodes
+        selected_indices.extend(range(start_index, end_index))
+
+        # Skip the next 2k neighboring nodes and move to the next layer
+        current_index = end_index + 2 * k
+        current_layer += 1
+        k *= 2
+
+    # Remove duplicates and sort the indices
+    selected_indices = sorted(set(selected_indices))
+
+    return selected_indices
+
+# Example usage
+i = 3  # Current node index
+k = 2  # Number of neighboring elements
+num_elements = 15  # Total number of elements in the tree
+
+selected_nodes = select_nodes(i, k, num_elements)
+print(selected_nodes)
+
+
+# Tree  
+
 
 
