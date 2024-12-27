@@ -64,6 +64,8 @@ class TimeSeriesTransformer(nn.Module):
 
 
 # Example usage
+'''
 test_transformer = TimeSeriesTransformer(32, [[16, 16, 16] for _ in range(0, 3)])
 test_tensor = torch.rand(8, 32)
 print(test_transformer(test_tensor))
+'''

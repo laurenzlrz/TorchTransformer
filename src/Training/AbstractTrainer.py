@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import torch
 
+
 class AbstractTrainer(ABC):
     def __init__(self, model, optimizer, loss_fn, train_loader, val_loader=None, device='cpu'):
         """
@@ -15,7 +16,8 @@ class AbstractTrainer(ABC):
         self.model.to(self.device)
         self.logging = False
         self.logging_metrics = [loss_fn]
-        self.log = {loss_fn.__class__.__name__: []}
+        self.log = {'train': {loss_fn.__class__.__name__: []},
+                    'validation': {loss_fn.__class__.__name__: []}}
 
     @abstractmethod
     def train_one_epoch(self):
@@ -24,14 +26,25 @@ class AbstractTrainer(ABC):
         """
         pass
 
+    @abstractmethod
+    def validate(self):
+        """
+        Validate the model. Must be implemented by subclasses.
+        """
+        pass
+
     def train(self, epochs):
+
+        self.model.train()
 
         for epoch in range(epochs):
             training_loss = self.train_one_epoch()
 
             if self.val_loader is not None:
+                self.model.eval()
                 val_loss = self.validate()
                 print(f'Epoch: {epoch} || Training Loss: {training_loss:.4f} || Validation Loss: {val_loss:.4f}')
+                self.model.train()
             else:
                 print(f'Epoch: {epoch} || Training Loss: {training_loss:.4f}')
 
@@ -48,13 +61,8 @@ class AbstractTrainer(ABC):
         Adds additional logging metrics to the logging.
         """
         self.logging_metrics.append(metric)
-        self.log[metric.__class__.__name__] = []
-    @abstractmethod
-    def validate(self):
-        """
-        Validate the model. Must be implemented by subclasses.
-        """
-        pass
+        self.log['train'][metric.__class__.__name__] = []
+        self.log['validation'][metric.__class__.__name__] = []
 
     def save_checkpoint(self, path):
         """
