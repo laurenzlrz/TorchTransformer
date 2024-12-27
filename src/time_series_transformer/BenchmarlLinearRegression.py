@@ -7,9 +7,11 @@ from src.time_series_transformer.TimeSeriesTransformerTestTrain import get_etth1
 class LinearRegression(nn.Module):
     def __init__(self, num_inputs, num_outputs):
         super().__init__()
+        self.num_inputs = num_inputs
         self.model = nn.Sequential(nn.Linear(num_inputs, num_outputs))
     
     def forward(self, x):
+        x = x.reshape(x.shape[0], self.num_inputs)
         return self.model(x)
 
 sequence_length = 4*24

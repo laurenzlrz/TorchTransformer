@@ -7,12 +7,12 @@ from src.time_series_transformer.TimeSeriesTransformer import TimeSeriesTransfor
 from src.encoder.Masking import BertMasking
 
 sequence_length =24*4
-num_encoder_blocks = 3
-head_sizes = [32, 32, 32]
+num_encoder_blocks = 4
+head_sizes = [64, 64, 64]
 ETTh1_csv = './ETTh1.csv'
 num_variables = 7
 
-learning_rate = 1e-4
+learning_rate = 1e-3
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 input_head_sizes = [head_sizes for _ in range (num_encoder_blocks)]
@@ -38,7 +38,7 @@ timeSeriesTrainer = TimeSeriesTrainer(model, optimizer, train_dataloader, device
 
 #timeSeriesTrainer.train_one_epoch()
 
-timeSeriesTrainer.train(10)
+timeSeriesTrainer.train(100)
 
 
 
