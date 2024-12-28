@@ -2,7 +2,7 @@ from torch import nn
 import torch.nn.functional as F
 
 from src.encoder.EncoderStack import EncoderStack
-
+from src.sparse_transformer.hierachical_transformer.BackendTree import Tree, create_padded_tree
 class TreeTransformer(nn.Module):
 
     def __init__(self, recurrent_encoder: EncoderStack, output_encoder: EncoderStack, block_size: int, pool_size: int):
@@ -11,10 +11,11 @@ class TreeTransformer(nn.Module):
         self.output_encoder = output_encoder
         self.pool_size = pool_size
         self.block_size = block_size
-        self.tree = None
+        self.last_seq_tree = None
 
     def forward(self, x):
         batch_size, seq_len, _ = x.size()
+        self.last_seq_tree = create_padded_tree(seq_len, self.block_size)
 
         while seq_len >= self.d:
             x = self.apply_transformer_in_blocks(x)
@@ -23,7 +24,7 @@ class TreeTransformer(nn.Module):
 
         return self.output_encoder(x)
 
-    def apply_transformer_in_blocks(self, x):
+    def apply_transformer_in_blocks(self, x, previous_layer):
         batch_size, seq_len, dim = x.size()
 
         # Padding

@@ -75,6 +75,7 @@ class TreeNode:
                 return found
         return None
 
+
 class Tree:
 
     def __init__(self, root: TreeNode):
@@ -216,3 +217,27 @@ class Tree:
         # Otherwise, append the current node and move further right.
         surroundings.append(node)
         return self._go_all_the_way_right(node.right, surroundings)
+
+
+def create_padded_tree(number_of_leaves: int) -> Tree:
+    def connect_siblings(current_level):
+        for i in range(len(current_level) - 1):
+            current_level[i].right = current_level[i + 1]
+            current_level[i + 1].left = current_level[i]
+
+    layers = []
+
+    leaves = [TreeNode(i, []) for i in range(0, number_of_leaves)]
+    connect_siblings(leaves)
+    layers.append(leaves)
+
+    while layers[-1].size() > 1:
+        next_layer = []
+        for i in range(0, len(layers[-1]) // d):
+            node = TreeNode(i, layers[-1][i * d: (i + 1) * d])
+        if (len(layers[-1]) % d) != 0:
+            node = TreeNode(i, layers[-1][(i + 1) * d:])
+        connect_siblings(next_layer)
+        layers.append(next_layer)
+
+    return Tree(layers[-1][0])
