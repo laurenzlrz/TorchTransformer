@@ -18,7 +18,7 @@ class TimeSeriesTransformer(nn.Module):
         regressor (nn.Linear): The linear layer for regression.
     """
 
-    def __init__(self, input_size, head_sizes, output_size, mask):
+    def __init__(self, input_size, head_sizes, output_size, mask, task='regression'):
         """
         Initializes the TimeSeriesTransformer model.
 
@@ -32,7 +32,12 @@ class TimeSeriesTransformer(nn.Module):
         self.mask = mask
         self.positional_encoding = PositionalEncoding(self.input_size)
         self.encoder_stack = EncoderStack(input_size, head_sizes)
-        self.regressor = nn.Linear(self.input_size, output_size)
+        if task == 'regression':
+            self.output = RegressionModule(input_size, input_size, output_size)
+        elif task == 'reconstruction':
+            self.output = ReconstructionModule(input_size, output_size)
+        else:
+            raise ValueError(f'{task} is illegal argument for task')
 
     def forward(self, x):
         """
@@ -49,10 +54,9 @@ class TimeSeriesTransformer(nn.Module):
         masked = self.mask.mask(x)
         positional_encoded = self.positional_encoding(masked)
         encoded = self.encoder_stack(positional_encoded)
-        pooled = encoded.mean(dim=-2)
-        pred = self.regressor(pooled)
+        out = self.output(encoded)
 
-        return pred
+        return out
 
     def train(self: T, mode: bool = True) -> T:
         self.mask.training = True
@@ -69,3 +73,39 @@ test_transformer = TimeSeriesTransformer(32, [[16, 16, 16] for _ in range(0, 3)]
 test_tensor = torch.rand(8, 32)
 print(test_transformer(test_tensor))
 '''
+class ReconstructionModule(nn.Module):
+    '''
+    This mudule is built to reconstruct the full sequence length.
+    For a sequence with dimension (sequence_length, input_size) the module
+    will return an output of dimensions (sequence_length, output_size)
+    '''
+    def __init__(self, input_size, output_size):
+        super(ReconstructionModule, self).__init__()
+        self.module = nn.Sequential(
+            nn.Linear(input_size, output_size)
+        )
+    def forward(self, encoded):
+        return self.module(encoded)
+
+class RegressionModule(nn.Module):
+    '''
+    This module will take the encoded inputs and return a regression prediction.
+    An input of dimensions (sequence_length, input_size) will turn into (output_size)
+    '''
+    def __init__(self, input_size, hidden_size, output_size):
+        super(RegressionModule, self).__init__()
+        self.hidden = nn.Linear(input_size, hidden_size)
+        self.regressor = nn.Linear(hidden_size*3, output_size)
+
+    def forward(self, encoded):
+        encoded = self.hidden(encoded)
+        encoded_mean = encoded.mean(dim=-2)
+        encoded_max, encoded_max_indices = encoded.max(dim=-2)
+        encoded_max_indices = torch.div(encoded_max_indices, encoded.size(1))
+
+        regressor_inputs = torch.concat([encoded_mean, encoded_max, encoded_max_indices], dim=-1)
+        pred = self.regressor(regressor_inputs)
+
+        return pred
+
+
