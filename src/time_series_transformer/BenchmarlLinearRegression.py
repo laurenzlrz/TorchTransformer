@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 
 from src.Training.TimeSeriesTrainer import TimeSeriesTrainer
-from src.time_series_transformer.TimeSeriesTransformerTestTrain import get_etth1_dataloader
+from src.time_series_transformer.ETTh1Dataset import get_etth1_dataloader
 
 class LinearRegression(nn.Module):
     def __init__(self, num_inputs, num_outputs):
